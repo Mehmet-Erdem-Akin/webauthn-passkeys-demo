@@ -7,9 +7,24 @@ import type {
 } from '@simplewebauthn/typescript-types'
 import { userChallenges, addUserCredential, type StoredCredential } from '../../../../lib/webauthn-storage'
 
-// RP (Relying Party) yapılandırması
-const rpID = 'localhost' // Production'da gerçek domain
-const origin = 'http://localhost:3000' // Production'da https://yourdomain.com
+// RP (Relying Party) yapılandırması helper function
+const getRpConfig = (req: NextApiRequest) => {
+    const host = req.headers.host || 'localhost:3000'
+
+    // Netlify ve diğer production environment'lar için
+    if (host.includes('netlify.app') || host.includes('vercel.app') || (!host.includes('localhost') && !host.includes('127.0.0.1'))) {
+        return {
+            rpID: host.split(':')[0], // Port'u kaldır
+            origin: `https://${host}`
+        }
+    }
+
+    // Development environment için
+    return {
+        rpID: 'localhost',
+        origin: `http://${host}`
+    }
+}
 
 export default async function handler(
     req: NextApiRequest,
@@ -20,6 +35,8 @@ export default async function handler(
     }
 
     try {
+        const { rpID, origin } = getRpConfig(req)
+
         const { username, credential, challenge }: {
             username: string;
             credential: RegistrationResponseJSON;
