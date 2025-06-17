@@ -72,6 +72,9 @@ export default function Demo() {
             const result = await registerPasskey(state.username)
 
             if (result.success) {
+                // Progressive register'dan kalan form verilerini temizle (temel demo için)
+                localStorage.removeItem('userFormData')
+
                 setState(prev => ({
                     ...prev,
                     step: 'success',
@@ -105,6 +108,9 @@ export default function Demo() {
                 localStorage.setItem('authUser', result.user || 'Unknown User')
                 localStorage.setItem('authTime', new Date().toISOString())
 
+                // Progressive register'dan kalan form verilerini temizle (temel demo için)
+                localStorage.removeItem('userFormData')
+
                 setState(prev => ({
                     ...prev,
                     step: 'success',
@@ -135,6 +141,9 @@ export default function Demo() {
     }
 
     const resetDemo = () => {
+        // Progressive register'dan kalan form verilerini temizle
+        localStorage.removeItem('userFormData')
+
         setState(prev => ({
             step: 'start',
             username: '',
